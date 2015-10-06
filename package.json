@@ -1,0 +1,33 @@
+{
+  "name": "observers",
+  "version": "0.1.0-pre",
+  "description": "A simple implentation of JavaScript observables",
+  "main": "src/index",
+  "scripts": {
+    "test": "mocha",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seikho/observers.git"
+  },
+  "keywords": [
+    "javascript",
+    "observable",
+    "objects",
+    "watch",
+    "subscribe",
+    "event"
+  ],
+  "author": "Carl Winkler",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seikho/observers/issues"
+  },
+  "homepage": "https://github.com/seikho/observers#readme",
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "typescript": "^1.6.2"
+  }
+}
