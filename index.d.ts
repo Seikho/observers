@@ -1,4 +1,6 @@
-export function observe<T>(object: any | any[]): Observable<T>;
+export function observe<T>(object?: T): Observable<T>;
+
+export function observeArray<T>(object?: T[]): ObservableArray<T>;
 
 export interface Observable<T> {
     (): T;

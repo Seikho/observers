@@ -1,9 +1,11 @@
 import * as Obs from '../index.d.ts';
 
-export function observe<T>(object?: any|any[]) {
-    if (Array.isArray(object)) return ObservableArray<T>(object);
-    
+export function observe<T>(object?: T) {
     return Observable<T>(object);
+}
+
+export function observeArray<T>(object?: T[]) {
+    return ObservableArray<T>(object);
 }
 
 var Observable = <T>(val: T): Obs.Observable<T> => {

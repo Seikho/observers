@@ -1,10 +1,12 @@
 var _this = this;
 function observe(object) {
-    if (Array.isArray(object))
-        return ObservableArray(object);
     return Observable(object);
 }
 exports.observe = observe;
+function observeArray(object) {
+    return ObservableArray(object);
+}
+exports.observeArray = observeArray;
 var Observable = function (val) {
     var value = val;
     var subscribers = [];
