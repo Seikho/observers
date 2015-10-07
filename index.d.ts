@@ -9,10 +9,13 @@ export interface Observable<T> {
     removeSubscribers(): void;
 }
 
-export interface ObservableArray<T> extends Observable<T> {
+export interface ObservableArray<T> {
     (): Array<T>;
     
     (newValue: Array<T>): void;
+    
+    
+    
     
     find(predicate: Predicate<T, boolean>): T;
     
@@ -30,8 +33,12 @@ export interface ObservableArray<T> extends Observable<T> {
     
     reduce<U>(predicate: Reduce<T, U>, initialValue?: U): U;
     
+    removeSubscribers(): void;
+    
     shift(): number;
     
+    subscribe(func: (newValue: T[]) => void): void;
+        
     some(predicate: Predicate<T, boolean>): boolean;
     
     unshift(): number;

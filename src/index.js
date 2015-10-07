@@ -1,4 +1,3 @@
-var _this = this;
 function observe(object) {
     return Observable(object);
 }
@@ -22,7 +21,7 @@ var Observable = function (val) {
             throw new Error('Subscriber is not a function');
         subscribers.push(fn);
     };
-    obs.removeSubscribers = function () { return _this.subscribers = []; };
+    obs.removeSubscribers = function () { return subscribers = []; };
     return obs;
 };
 var ObservableArray = function (vals) {
@@ -48,7 +47,7 @@ var ObservableArray = function (vals) {
             throw new Error('Subscriber is not a function');
         subscribers.push(fn);
     };
-    obs.removeSubscribers = function () { return _this.subscribers = []; };
+    obs.removeSubscribers = function () { return subscribers = []; };
     obs.push = function (value) { return mutate('push', value); };
     obs.pop = function () { return mutate('pop'); };
     obs.shift = function () { return mutate('shift'); };

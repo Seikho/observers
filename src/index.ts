@@ -28,7 +28,7 @@ var Observable = <T>(val: T): Obs.Observable<T> => {
         subscribers.push(fn);
     }
 
-    obs.removeSubscribers = () => this.subscribers = [];
+    obs.removeSubscribers = () => subscribers = [];
 
     return obs;
 }
@@ -65,7 +65,7 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
         subscribers.push(fn);
     }
 
-    obs.removeSubscribers = () => this.subscribers = [];
+    obs.removeSubscribers = () => subscribers = [];
 
     obs.push = (value: T) => mutate('push', value);
 
