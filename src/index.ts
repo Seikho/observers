@@ -105,9 +105,9 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     
     obs.remove = (predicate: Obs.Predicate<T, boolean>) => {
         var removedItems = array.filter(predicate);
-        var array = array.filter((value, index, arr) => !predicate(value, index, arr));
+        var newArray = array.filter((value, index, arr) => !predicate(value, index, arr));
         
-        obs(array);        
+        obs(newArray);        
         return removedItems;
     }
     

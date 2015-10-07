@@ -78,8 +78,8 @@ var ObservableArray = function (vals) {
     };
     obs.remove = function (predicate) {
         var removedItems = array.filter(predicate);
-        var array = array.filter(function (value, index, arr) { return !predicate(value, index, arr); });
-        obs(array);
+        var newArray = array.filter(function (value, index, arr) { return !predicate(value, index, arr); });
+        obs(newArray);
         return removedItems;
     };
     obs.removeAll = function () {
