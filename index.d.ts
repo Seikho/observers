@@ -32,9 +32,17 @@ export interface ObservableArray<T> {
     
     reduce<U>(predicate: Reduce<T, U>, initialValue?: U): U;
     
+    remove(predicate: Predicate<T, boolean>): T[];
+    
+    removeAll(): T[];
+    
     removeSubscribers(): void;
     
     shift(): number;
+    
+    slice(start?: number, end?: number): T[];
+    
+    splice(start?: number, end?: number): T[];
     
     subscribe(func: (newValue: T[]) => void): void;
         

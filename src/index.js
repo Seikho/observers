@@ -71,6 +71,22 @@ var ObservableArray = function (vals) {
     obs.reduce = function (predicate, initialValue) { return array.reduce(predicate, initialValue); };
     obs.join = function (seperator) { return array.join(seperator); };
     obs.slice = function (start, end) { return array.slice(start, end); };
+    obs.splice = function (start, end) {
+        var result = array.splice(start, end);
+        notify();
+        return result;
+    };
+    obs.remove = function (predicate) {
+        var removedItems = array.filter(predicate);
+        var array = array.filter(function (value, index, arr) { return !predicate(value, index, arr); });
+        obs(array);
+        return removedItems;
+    };
+    obs.removeAll = function () {
+        var removedItems = array.slice();
+        obs([]);
+        return removedItems;
+    };
     obs.every = function (predicate) { return array.every(predicate); };
     return obs;
 };

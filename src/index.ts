@@ -50,7 +50,7 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
         notify();
         return result;
     }
-
+    
     var obs: any;
 
 
@@ -96,6 +96,26 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     obs.join = (seperator?: string) => array.join(seperator);
 
     obs.slice = (start?: number, end?: number) => array.slice(start, end);
+    
+    obs.splice = (start?: number, end?: number) => {
+        var result = array.splice(start, end);
+        notify();
+        return result;
+    }
+    
+    obs.remove = (predicate: Obs.Predicate<T, boolean>) => {
+        var removedItems = array.filter(predicate);
+        var array = array.filter((value, index, arr) => !predicate(value, index, arr));
+        
+        obs(array);        
+        return removedItems;
+    }
+    
+    obs.removeAll = () => {
+        var removedItems = array.slice();
+        obs([]);
+        return removedItems;
+    }
     
     obs.every = (predicate: Obs.Predicate<T, boolean>) => array.every(predicate);
 
