@@ -1,6 +1,8 @@
 import * as Obs from '../index.d.ts';
 
-export function observe<T>(object?: any) {
+export function observe<T>(object?: any|any[]) {
+    if (Array.isArray(object)) return ObservableArray<T>(object);
+    
     return Observable<T>(object);
 }
 

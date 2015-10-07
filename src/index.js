@@ -1,5 +1,7 @@
 var _this = this;
 function observe(object) {
+    if (Array.isArray(object))
+        return ObservableArray(object);
     return Observable(object);
 }
 exports.observe = observe;
