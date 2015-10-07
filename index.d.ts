@@ -14,8 +14,7 @@ export interface ObservableArray<T> {
     
     (newValue: Array<T>): void;
     
-    
-    
+    every(predicate: Predicate<T, boolean>): boolean;
     
     find(predicate: Predicate<T, boolean>): T;
     
@@ -41,7 +40,7 @@ export interface ObservableArray<T> {
         
     some(predicate: Predicate<T, boolean>): boolean;
     
-    unshift(): number;
+    unshift(...values: T[]): number;
 }
 
 export interface Subscriber<T> {

@@ -28,8 +28,13 @@ var ObservableArray = function (vals) {
     var array = vals;
     var subscribers = [];
     var notify = function () { return subscribers.forEach(function (fn) { return fn(array); }); };
-    var mutate = function (mutator, value) {
+    var call = function (mutator, value) {
         var result = array[mutator](value);
+        notify();
+        return result;
+    };
+    var apply = function (mutator, value) {
+        var result = Array.prototype[mutator].apply(array, value);
         notify();
         return result;
     };
@@ -48,15 +53,15 @@ var ObservableArray = function (vals) {
         subscribers.push(fn);
     };
     obs.removeSubscribers = function () { return subscribers = []; };
-    obs.push = function (value) { return mutate('push', value); };
-    obs.pop = function () { return mutate('pop'); };
-    obs.shift = function () { return mutate('shift'); };
+    obs.push = function (value) { return call('push', value); };
+    obs.pop = function () { return call('pop'); };
+    obs.shift = function () { return call('shift'); };
     obs.unshift = function () {
         var values = [];
         for (var _i = 0; _i < arguments.length; _i++) {
             values[_i - 0] = arguments[_i];
         }
-        return mutate.apply(['unshift', values]);
+        return apply('unshift', values);
     };
     obs.reverse = function () { return array.reverse(); };
     obs.find = function (predicate) { return array.filter(predicate)[0]; };
@@ -66,6 +71,7 @@ var ObservableArray = function (vals) {
     obs.reduce = function (predicate, initialValue) { return array.reduce(predicate, initialValue); };
     obs.join = function (seperator) { return array.join(seperator); };
     obs.slice = function (start, end) { return array.slice(start, end); };
+    obs.every = function (predicate) { return array.every(predicate); };
     return obs;
 };
 //# sourceMappingURL=index.js.map

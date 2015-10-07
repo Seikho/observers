@@ -39,8 +39,14 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
 
     var notify = () => subscribers.forEach(fn => fn(array));
 
-    var mutate = (mutator: string, value?: any) => {
+    var call = (mutator: string, value?: any) => {
         var result = array[mutator](value);
+        notify();
+        return result;
+    }
+
+    var apply = (mutator: string, value?: any) => {
+        var result = Array.prototype[mutator].apply(array, value);
         notify();
         return result;
     }
@@ -67,13 +73,13 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
 
     obs.removeSubscribers = () => subscribers = [];
 
-    obs.push = (value: T) => mutate('push', value);
+    obs.push = (value: T) => call('push', value);
 
-    obs.pop = () => mutate('pop');
+    obs.pop = () => call('pop');
 
-    obs.shift = () => mutate('shift');
+    obs.shift = () => call('shift');
 
-    obs.unshift = (...values: T[]) => mutate.apply(['unshift', values]);
+    obs.unshift = (...values: T[]) => apply('unshift', values);
 
     obs.reverse = () => array.reverse();
 
@@ -90,6 +96,8 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     obs.join = (seperator?: string) => array.join(seperator);
 
     obs.slice = (start?: number, end?: number) => array.slice(start, end);
+    
+    obs.every = (predicate: Obs.Predicate<T, boolean>) => array.every(predicate);
 
     return obs;
 }
