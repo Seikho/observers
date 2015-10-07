@@ -130,4 +130,46 @@ describe('observable array tests', () => {
         expect(object.every(x => x === 'z')).to.be.false;
     });
 
+    it('will replicate .map', () => {
+        object(['a', 'b', 'c']);
+
+        var mapped = object.map(x => String.fromCharCode(x.charCodeAt(0) + 1));
+
+        expect(mapped.join('')).to.equal('bcd');
+    });
+
+    it('will replicate .reduce', () => {
+        var obj = obs.observeArray([1, 2, 3]);
+
+        var reduced = obj.reduce((prev, curr) => curr += prev, 0);
+
+        expect(reduced).to.equal(6);
+    });
+
+    it('will replicate .reverse', () => {
+        var reversed = object.reverse();
+        expect(reversed.join('')).to.equal('cba');
+    });
+
+    it('will replicate .splice', () => {
+        var obj = obs.observeArray([1, 2, 3, 4]);
+
+        expect(obj.splice(1, 1).join('')).to.equal('2');
+        expect(obj.join('')).to.equal('134');
+    });
+
+    it('will remove elements', () => {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+
+        expect(obj.remove(x => x < 3).join('')).to.equal('12');
+        expect(obj.join('')).to.equal('345');
+    });
+
+    it('will remove all elements', () => {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+
+        expect(obj.removeAll().join('')).to.equal('12345');
+        expect(obj.join('')).to.equal('');
+    });
+
 });

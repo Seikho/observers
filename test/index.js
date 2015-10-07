@@ -95,5 +95,34 @@ describe('observable array tests', function () {
         expect(object.every(function (x) { return x <= 'z'; })).to.be.true;
         expect(object.every(function (x) { return x === 'z'; })).to.be.false;
     });
+    it('will replicate .map', function () {
+        object(['a', 'b', 'c']);
+        var mapped = object.map(function (x) { return String.fromCharCode(x.charCodeAt(0) + 1); });
+        expect(mapped.join('')).to.equal('bcd');
+    });
+    it('will replicate .reduce', function () {
+        var obj = obs.observeArray([1, 2, 3]);
+        var reduced = obj.reduce(function (prev, curr) { return curr += prev; }, 0);
+        expect(reduced).to.equal(6);
+    });
+    it('will replicate .reverse', function () {
+        var reversed = object.reverse();
+        expect(reversed.join('')).to.equal('cba');
+    });
+    it('will replicate .splice', function () {
+        var obj = obs.observeArray([1, 2, 3, 4]);
+        expect(obj.splice(1, 1).join('')).to.equal('2');
+        expect(obj.join('')).to.equal('134');
+    });
+    it('will remove elements', function () {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+        expect(obj.remove(function (x) { return x < 3; }).join('')).to.equal('12');
+        expect(obj.join('')).to.equal('345');
+    });
+    it('will remove all elements', function () {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+        expect(obj.removeAll().join('')).to.equal('12345');
+        expect(obj.join('')).to.equal('');
+    });
 });
 //# sourceMappingURL=index.js.map
