@@ -43,6 +43,12 @@ var ObservableArray = function (vals) {
         array = newValues;
         notify();
     };
+    obs.subscribe = function (fn) {
+        if (typeof fn !== 'function')
+            throw new Error('Subscriber is not a function');
+        subscribers.push(fn);
+    };
+    obs.removeSubscribers = function () { return _this.subscribers = []; };
     obs.push = function (value) { return mutate('push', value); };
     obs.pop = function () { return mutate('pop'); };
     obs.shift = function () { return mutate('shift'); };
