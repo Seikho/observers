@@ -46,19 +46,19 @@ describe('observable array tests', () => {
     });
 
     it('will accept a subscriber', () => {
-        expect(object.subscribe.bind(object.subscribe, (x => null))).to.not.throw;
+        expect(object.subscribe.bind(object.subscribe, (x => null))).to.not.throw();
     });
 
     it('will not accept a subscriber that is not a function', () => {
-        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw;
+        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw();
     });
 
     it('will not accept a non-array type', () => {
-        expect(object.bind(object, 'not a function')).to.throw;
+        expect(object.bind(object, 'not a function')).to.throw();
     });
 
     it('will accept an array type', () => {
-        expect(object.bind(object, ['1', '2', '3'])).to.not.throw;
+        expect(object.bind(object, ['1', '2', '3'])).to.not.throw();
     });
 
     it('will notify subscribers', done => {
@@ -115,6 +115,14 @@ describe('observable array tests', () => {
     it('will find a value', () => {
         expect(object.find(x => x === 'a')).to.equal('a');
     });
+    
+    it('will replicate findIndex', () => {
+       expect(object.findIndex(x => x === 'a')).to.equal(0); 
+    });
+    
+    it('will return -1 from findIndex if it fails to find', () => {
+       expect(object.findIndex(x => x === 'unfindable')).to.equal(-1); 
+    });
 
     it('will filter for a value', () => {
         expect(object.filter(x => x < 'c').join('')).to.equal('ab');
@@ -170,6 +178,24 @@ describe('observable array tests', () => {
 
         expect(obj.removeAll().join('')).to.equal('12345');
         expect(obj.join('')).to.equal('');
+    });
+    
+    it('will update an object and notify', done => {
+        var obj = obs.observeArray(['blue', 'green', 'yellow']);
+        
+        obj.subscribe(arr => {
+           expect(arr[0]).to.equal('orange');
+           done();
+        });
+        
+        obj.update(x => x === 'blue', 'orange');
+    });
+    
+    it('will throw when update target cannot be found', () => {
+       var obj = obs.observeArray(['a', 'b', 'c']);
+       
+       expect(obj.update.bind(obj.update, x => x === 'xyz', 'never used')).to.throw();
+       expect(obj.join('')).to.equal('abc');
     });
 
 });

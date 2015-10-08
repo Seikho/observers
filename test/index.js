@@ -33,16 +33,16 @@ describe('observable array tests', function () {
         expect(typeof object).to.equal('function');
     });
     it('will accept a subscriber', function () {
-        expect(object.subscribe.bind(object.subscribe, (function (x) { return null; }))).to.not.throw;
+        expect(object.subscribe.bind(object.subscribe, (function (x) { return null; }))).to.not.throw();
     });
     it('will not accept a subscriber that is not a function', function () {
-        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw;
+        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw();
     });
     it('will not accept a non-array type', function () {
-        expect(object.bind(object, 'not a function')).to.throw;
+        expect(object.bind(object, 'not a function')).to.throw();
     });
     it('will accept an array type', function () {
-        expect(object.bind(object, ['1', '2', '3'])).to.not.throw;
+        expect(object.bind(object, ['1', '2', '3'])).to.not.throw();
     });
     it('will notify subscribers', function (done) {
         object.subscribe(function (x) {
@@ -84,6 +84,12 @@ describe('observable array tests', function () {
     it('will find a value', function () {
         expect(object.find(function (x) { return x === 'a'; })).to.equal('a');
     });
+    it('will replicate findIndex', function () {
+        expect(object.findIndex(function (x) { return x === 'a'; })).to.equal(0);
+    });
+    it('will return -1 from findIndex if it fails to find', function () {
+        expect(object.findIndex(function (x) { return x === 'unfindable'; })).to.equal(-1);
+    });
     it('will filter for a value', function () {
         expect(object.filter(function (x) { return x < 'c'; }).join('')).to.equal('ab');
     });
@@ -123,6 +129,19 @@ describe('observable array tests', function () {
         var obj = obs.observeArray([1, 2, 3, 4, 5]);
         expect(obj.removeAll().join('')).to.equal('12345');
         expect(obj.join('')).to.equal('');
+    });
+    it('will update an object and notify', function (done) {
+        var obj = obs.observeArray(['blue', 'green', 'yellow']);
+        obj.subscribe(function (arr) {
+            expect(arr[0]).to.equal('orange');
+            done();
+        });
+        obj.update(function (x) { return x === 'blue'; }, 'orange');
+    });
+    it('will throw when update target cannot be found', function () {
+        var obj = obs.observeArray(['a', 'b', 'c']);
+        expect(obj.update.bind(obj.update, function (x) { return x === 'xyz'; }, 'never used')).to.throw();
+        expect(obj.join('')).to.equal('abc');
     });
 });
 //# sourceMappingURL=index.js.map
