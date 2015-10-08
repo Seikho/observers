@@ -65,6 +65,7 @@ var ObservableArray = function (vals) {
     };
     obs.reverse = function () { return array.reverse(); };
     obs.find = function (predicate) { return array.filter(predicate)[0]; };
+    obs.findIndex = function (predicate) { return array.reduce(function (prev, curr, index) { return prev = predicate(curr) && prev < 0 ? index : prev; }, -1); };
     obs.filter = function (predicate) { return array.filter(predicate); };
     obs.map = function (predicate) { return array.map(predicate); };
     obs.some = function (predicate) { return array.some(predicate); };
@@ -88,6 +89,14 @@ var ObservableArray = function (vals) {
         return removedItems;
     };
     obs.every = function (predicate) { return array.every(predicate); };
+    obs.update = function (predicate, newValue) {
+        var index = obs.findIndex(predicate);
+        if (index === -1)
+            throw new Error('Unable to find matching element');
+        array[index] = newValue;
+        notify();
+        return newValue;
+    };
     return obs;
 };
 //# sourceMappingURL=index.js.map

@@ -18,6 +18,8 @@ export interface ObservableArray<T> {
     
     find(predicate: Predicate<T, boolean>): T;
     
+    findIndex(predicate: Predicate<T, boolean>): number;
+    
     filter(predicate: Predicate<T, boolean>): Array<T>;
     
     join(separator?: string): string;
@@ -49,6 +51,8 @@ export interface ObservableArray<T> {
     some(predicate: Predicate<T, boolean>): boolean;
     
     unshift(...values: T[]): number;
+    
+    update(predicate: Predicate<T, boolean>, newValue: T): T;
 }
 
 export interface Subscriber<T> {

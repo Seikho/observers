@@ -50,7 +50,7 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
         notify();
         return result;
     }
-    
+
     var obs: any;
 
 
@@ -85,6 +85,8 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
 
     obs.find = (predicate: Obs.Predicate<T, boolean>) => array.filter(predicate)[0];
 
+    obs.findIndex = (predicate: Obs.Predicate<T, boolean>) => array.reduce((prev, curr, index) => prev = predicate(curr) && prev < 0 ? index : prev, -1);
+
     obs.filter = (predicate: Obs.Predicate<T, boolean>) => array.filter(predicate);
 
     obs.map = (predicate: Obs.Predicate<T, any>) => array.map(predicate);
@@ -96,28 +98,37 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     obs.join = (seperator?: string) => array.join(seperator);
 
     obs.slice = (start?: number, end?: number) => array.slice(start, end);
-    
+
     obs.splice = (start?: number, end?: number) => {
         var result = array.splice(start, end);
         notify();
         return result;
     }
-    
+
     obs.remove = (predicate: Obs.Predicate<T, boolean>) => {
         var removedItems = array.filter(predicate);
         var newArray = array.filter((value, index, arr) => !predicate(value, index, arr));
-        
-        obs(newArray);        
+
+        obs(newArray);
         return removedItems;
     }
-    
+
     obs.removeAll = () => {
         var removedItems = array.slice();
         obs([]);
         return removedItems;
     }
-    
+
     obs.every = (predicate: Obs.Predicate<T, boolean>) => array.every(predicate);
+
+    obs.update = (predicate: Obs.Predicate<T, boolean>, newValue: T) => {
+        var index = obs.findIndex(predicate);
+        if (index === -1) throw new Error('Unable to find matching element');
+        
+        array[index] = newValue;
+        notify();
+        return newValue;
+    }
 
     return obs;
 }
