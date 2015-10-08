@@ -191,10 +191,10 @@ describe('observable array tests', () => {
         obj.update(x => x === 'blue', 'orange');
     });
     
-    it('will throw when update target cannot be found', () => {
+    it('will return undefined when update target cannot be found', () => {
        var obj = obs.observeArray(['a', 'b', 'c']);
        
-       expect(obj.update.bind(obj.update, x => x === 'xyz', 'never used')).to.throw();
+       expect(obj.update(x => x === 'd', 'new value')).to.equal(undefined);
        expect(obj.join('')).to.equal('abc');
     });
 

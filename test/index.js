@@ -138,9 +138,9 @@ describe('observable array tests', function () {
         });
         obj.update(function (x) { return x === 'blue'; }, 'orange');
     });
-    it('will throw when update target cannot be found', function () {
+    it('will return undefined when update target cannot be found', function () {
         var obj = obs.observeArray(['a', 'b', 'c']);
-        expect(obj.update.bind(obj.update, function (x) { return x === 'xyz'; }, 'never used')).to.throw();
+        expect(obj.update(function (x) { return x === 'd'; }, 'new value')).to.equal(undefined);
         expect(obj.join('')).to.equal('abc');
     });
 });
