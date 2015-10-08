@@ -129,6 +129,8 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
         notify();
         return newValue;
     }
+    
+    obs.sort = (comparer: (left: T, right: T) => number) => call('sort', comparer);
 
     return obs;
 }

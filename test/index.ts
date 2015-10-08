@@ -197,5 +197,14 @@ describe('observable array tests', () => {
        expect(obj.update(x => x === 'd', 'new value')).to.equal(undefined);
        expect(obj.join('')).to.equal('abc');
     });
+    
+    it('will replicate .sort', () => {
+       var obj = obs.observeArray([1,2,3,4,5]);
+       
+       obj.sort((l, r) => l < r);
+       expect(obj.join('')).to.equal('54321');
+       obj.sort((l, r) => l > r);
+       expect(obj.join('')).to.equal('12345');
+    });
 
 });

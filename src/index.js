@@ -97,6 +97,7 @@ var ObservableArray = function (vals) {
         notify();
         return newValue;
     };
+    obs.sort = function (comparer) { return call('sort', comparer); };
     return obs;
 };
 //# sourceMappingURL=index.js.map

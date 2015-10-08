@@ -143,5 +143,12 @@ describe('observable array tests', function () {
         expect(obj.update(function (x) { return x === 'd'; }, 'new value')).to.equal(undefined);
         expect(obj.join('')).to.equal('abc');
     });
+    it('will replicate .sort', function () {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+        obj.sort(function (l, r) { return l < r; });
+        expect(obj.join('')).to.equal('54321');
+        obj.sort(function (l, r) { return l > r; });
+        expect(obj.join('')).to.equal('12345');
+    });
 });
 //# sourceMappingURL=index.js.map
