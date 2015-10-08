@@ -44,6 +44,8 @@ export interface ObservableArray<T> {
     
     slice(start?: number, end?: number): T[];
     
+    sort(comparer: (left: T, right: T) => number|boolean): T[]; 
+    
     splice(start?: number, end?: number): T[];
     
     subscribe(func: (newValue: T[]) => void): void;
