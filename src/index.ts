@@ -123,7 +123,7 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
 
     obs.update = (predicate: Obs.Predicate<T, boolean>, newValue: T) => {
         var index = obs.findIndex(predicate);
-        if (index === -1) throw new Error('Unable to find matching element');
+        if (index === -1) return void 0;
         
         array[index] = newValue;
         notify();

@@ -92,7 +92,7 @@ var ObservableArray = function (vals) {
     obs.update = function (predicate, newValue) {
         var index = obs.findIndex(predicate);
         if (index === -1)
-            throw new Error('Unable to find matching element');
+            return void 0;
         array[index] = newValue;
         notify();
         return newValue;
