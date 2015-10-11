@@ -1,11 +1,25 @@
 function observe(object) {
+    var observable = Observable(object);
+    var calledFromComputed = !!observe.caller['computed'];
+    if (calledFromComputed) {
+        observable.subscribe(function () { return observable.caller['computed'](); });
+    }
     return Observable(object);
 }
 exports.observe = observe;
 function observeArray(object) {
-    return ObservableArray(object);
+    var observable = ObservableArray(object);
+    var calledFromComputed = !!observe.caller['computed'];
+    if (calledFromComputed) {
+        observable.subscribe(function () { return observable.caller['computed'](); });
+    }
+    return observable;
 }
 exports.observeArray = observeArray;
+function computed(evaluator) {
+    return Computed(evaluator);
+}
+exports.computed = computed;
 var Observable = function (val) {
     var value = val;
     var subscribers = [];
@@ -99,5 +113,24 @@ var ObservableArray = function (vals) {
     };
     obs.sort = function (comparer) { return call('sort', comparer); };
     return obs;
+};
+var Computed = function (evaluator) {
+    if (typeof evaluator !== 'function')
+        throw new Error('Computed evaluator must be a function');
+    var subscribers = [];
+    var value = null;
+    var update = function () { return value(evaluator()); };
+    var comp;
+    comp = function () { return evaluator(); };
+    comp.subscribe = function (func) {
+        value.subscribe(func);
+    };
+    comp.removeSubscribers = function () { return value.removeSubscribers(); };
+    function initialize(evaluator) {
+        value = observe(evaluator());
+    }
+    initialize['computed'] = function () { return update(); };
+    initialize(evaluator);
+    return comp;
 };
 //# sourceMappingURL=index.js.map

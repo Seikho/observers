@@ -2,6 +2,16 @@ export function observe<T>(object?: T): Observable<T>;
 
 export function observeArray<T>(object?: T[]): ObservableArray<T>;
 
+export interface Computed<T> {
+    (): T;
+}
+
+export interface Computed<T> {
+    (): T;
+    subscribe(func: (newValue: T) => void): void;
+    removeSubscribers(): void;
+}
+
 export interface Observable<T> {
     (): T;
     (newValue: T): void;

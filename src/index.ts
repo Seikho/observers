@@ -1,11 +1,29 @@
 import * as Obs from '../index.d.ts';
 
 export function observe<T>(object?: T) {
+    var observable = Observable<T>(object);
+    
+    var calledFromComputed = !!observe.caller['computed'];
+    if (calledFromComputed) {
+        observable.subscribe(() => observable.caller['computed']());
+    }
+    
     return Observable<T>(object);
 }
 
 export function observeArray<T>(object?: T[]) {
-    return ObservableArray<T>(object);
+    var observable = ObservableArray<T>(object);
+    
+    var calledFromComputed = !!observe.caller['computed'];
+    if (calledFromComputed) {
+        observable.subscribe(() => observable.caller['computed']());
+    }
+    
+    return observable;
+}
+
+export function computed<T>(evaluator: () => T) {
+    return Computed<T>(evaluator);
 }
 
 var Observable = <T>(val: T): Obs.Observable<T> => {
@@ -133,4 +151,35 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     obs.sort = (comparer: (left: T, right: T) => number) => call('sort', comparer);
 
     return obs;
+}
+
+var Computed = <T>(evaluator: () => T) => {
+    if (typeof evaluator !== 'function')
+        throw new Error('Computed evaluator must be a function');
+    
+    var subscribers = [];
+    
+    var value: Obs.Observable<T> = null;
+    
+    var update = () => value(evaluator());
+    
+    var comp: any;
+    
+    comp = () => evaluator();
+    
+    comp.subscribe = (func: (newValue: T) => void) => {
+        value.subscribe(func);
+    }
+    
+    comp.removeSubscribers = () => value.removeSubscribers();
+    
+    function initialize(evaluator: Function) {
+        value = observe(evaluator());
+    }
+    
+    initialize['computed'] = () => update();
+    
+    initialize(evaluator);
+    
+    return comp;   
 }
