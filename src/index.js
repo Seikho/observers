@@ -119,7 +119,6 @@ var ObservableArray = function (vals) {
 var Computed = function (evaluator) {
     if (typeof evaluator !== 'function')
         throw new Error('Computed evaluator must be a function');
-    var subscribers = [];
     var value = null;
     var update = function () {
         value(evaluator());
@@ -130,9 +129,9 @@ var Computed = function (evaluator) {
         var isCalledFromComputed = comp.caller.initialize;
         if (isCalledFromComputed) {
             var caller = comp.caller.computed;
-            subscribers.push(function () { return caller(); });
+            value.subscribe(function () { return caller(); });
         }
-        evaluator();
+        return value();
     };
     comp.subscribe = function (func) {
         value.subscribe(func);

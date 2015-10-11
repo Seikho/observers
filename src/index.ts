@@ -157,8 +157,6 @@ var Computed = <T>(evaluator: () => T): Obs.Computed<T> => {
     if (typeof evaluator !== 'function')
         throw new Error('Computed evaluator must be a function');
 
-    var subscribers = [];
-
     var value: Obs.Observable<T> = null;
 
     var update = () => {
@@ -172,9 +170,9 @@ var Computed = <T>(evaluator: () => T): Obs.Computed<T> => {
         var isCalledFromComputed = comp.caller.initialize;
         if (isCalledFromComputed) {
             var caller = comp.caller.computed;
-            subscribers.push(() => caller());
+            value.subscribe(() => caller());
         }
-        evaluator();
+        return value();
     };
 
     comp.subscribe = (func: (newValue: T) => void) => {
