@@ -7,10 +7,10 @@ describe('observable object tests', function () {
         expect(typeof object).to.equal('function');
     });
     it('will accept a subscriber', function () {
-        expect(object.subscribe.bind(object.subscribe, (function (x) { return typeof x === 'string'; }))).to.not.throw;
+        expect(object.subscribe.bind(object.subscribe, (function (x) { return typeof x === 'string'; }))).to.not.throw();
     });
     it('will not accept a subscriber that is not a function', function () {
-        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw;
+        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw();
     });
     it('will notify subscribers', function (done) {
         object.removeSubscribers();
@@ -149,6 +149,73 @@ describe('observable array tests', function () {
         expect(obj.join('')).to.equal('54321');
         obj.sort(function (l, r) { return l > r; });
         expect(obj.join('')).to.equal('12345');
+    });
+});
+describe('computed observable tests', function () {
+    it('will compute with non-observables', function () {
+        var x = 1;
+        var y = 2;
+        var comp = obs.computed(function () { return x + y; });
+        expect(comp()).to.equal(3);
+        x = 2;
+        expect(comp()).to.equal(3);
+    });
+    it('will compute with observables', function () {
+        var x = obs.observe(1);
+        var y = obs.observe(2);
+        var comp = obs.computed(function () { return x() + y(); });
+        expect(comp()).to.equal(3);
+        x(2);
+        expect(comp()).to.equal(4);
+    });
+    it('will notify when dependent observables change', function (done) {
+        var x = obs.observe(1);
+        var y = obs.observe(2);
+        var comp = obs.computed(function () { return x() + y(); });
+        comp.subscribe(function (val) {
+            expect(val).to.equal(4);
+            done();
+        });
+        x(2);
+    });
+    it('will compute with computed observables', function () {
+        var x = obs.observe(2);
+        var y = obs.observe(4);
+        var c1 = obs.computed(function () { return x() + y(); });
+        var z = obs.observe(6);
+        var c2 = obs.computed(function () { return c1() + z(); });
+        expect(c2()).to.equal(12);
+        x(4);
+        expect(c2()).to.equal(14);
+        z(8);
+        expect(c2()).to.equal(16);
+    });
+    it('will notify when dependent computed values change', function (done) {
+        var x = obs.observe(2);
+        var y = obs.observe(4);
+        var c1 = obs.computed(function () { return x() + y(); });
+        var z = obs.observe(6);
+        var c2 = obs.computed(function () { return c1() + z(); });
+        c2.subscribe(function (val) {
+            expect(val).to.equal(14);
+            done();
+        });
+        x(4);
+    });
+    it('will compute with computed arrays', function () {
+        var x = obs.observeArray([1, 2, 3]);
+        var c = obs.computed(function () { return x().join(''); });
+        x.push(4);
+        expect(c()).to.equal('1234');
+    });
+    it('will notify when dependent computer arrays change', function (done) {
+        var x = obs.observeArray([1, 2, 3, 4]);
+        var c = obs.computed(function () { return x().reduce(function (prev, curr) { return prev += curr; }, 0); });
+        c.subscribe(function (val) {
+            expect(val).to.equal(15);
+            done();
+        });
+        x.push(5);
     });
 });
 //# sourceMappingURL=index.js.map

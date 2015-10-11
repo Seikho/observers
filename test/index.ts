@@ -12,11 +12,11 @@ describe('observable object tests', () => {
     });
 
     it('will accept a subscriber', () => {
-        expect(object.subscribe.bind(object.subscribe, (x => typeof x === 'string'))).to.not.throw;
+        expect(object.subscribe.bind(object.subscribe, (x => typeof x === 'string'))).to.not.throw();
     });
 
     it('will not accept a subscriber that is not a function', () => {
-        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw;
+        expect(object.subscribe.bind(object.subscribe, 'not a function')).to.throw();
     });
 
     it('will notify subscribers', done => {
@@ -115,13 +115,13 @@ describe('observable array tests', () => {
     it('will find a value', () => {
         expect(object.find(x => x === 'a')).to.equal('a');
     });
-    
+
     it('will replicate findIndex', () => {
-       expect(object.findIndex(x => x === 'a')).to.equal(0); 
+        expect(object.findIndex(x => x === 'a')).to.equal(0);
     });
-    
+
     it('will return -1 from findIndex if it fails to find', () => {
-       expect(object.findIndex(x => x === 'unfindable')).to.equal(-1); 
+        expect(object.findIndex(x => x === 'unfindable')).to.equal(-1);
     });
 
     it('will filter for a value', () => {
@@ -179,32 +179,121 @@ describe('observable array tests', () => {
         expect(obj.removeAll().join('')).to.equal('12345');
         expect(obj.join('')).to.equal('');
     });
-    
+
     it('will update an object and notify', done => {
         var obj = obs.observeArray(['blue', 'green', 'yellow']);
-        
+
         obj.subscribe(arr => {
-           expect(arr[0]).to.equal('orange');
-           done();
+            expect(arr[0]).to.equal('orange');
+            done();
         });
-        
+
         obj.update(x => x === 'blue', 'orange');
     });
-    
+
     it('will return undefined when update target cannot be found', () => {
-       var obj = obs.observeArray(['a', 'b', 'c']);
-       
-       expect(obj.update(x => x === 'd', 'new value')).to.equal(undefined);
-       expect(obj.join('')).to.equal('abc');
+        var obj = obs.observeArray(['a', 'b', 'c']);
+
+        expect(obj.update(x => x === 'd', 'new value')).to.equal(undefined);
+        expect(obj.join('')).to.equal('abc');
+    });
+
+    it('will replicate .sort', () => {
+        var obj = obs.observeArray([1, 2, 3, 4, 5]);
+
+        obj.sort((l, r) => l < r);
+        expect(obj.join('')).to.equal('54321');
+        obj.sort((l, r) => l > r);
+        expect(obj.join('')).to.equal('12345');
+    });
+
+});
+
+describe('computed observable tests', () => {
+
+    it('will compute with non-observables', () => {
+        var x = 1;
+        var y = 2;
+        var comp = obs.computed(() => x + y);
+        expect(comp()).to.equal(3);
+
+        x = 2;
+        expect(comp()).to.equal(3);
+    });
+
+    it('will compute with observables', () => {
+        var x = obs.observe(1);
+        var y = obs.observe(2);
+        var comp = obs.computed(() => x() + y());
+        expect(comp()).to.equal(3);
+        x(2);
+
+        expect(comp()).to.equal(4);
+    });
+
+    it('will notify when dependent observables change', done => {
+        var x = obs.observe(1);
+        var y = obs.observe(2);
+
+        var comp = obs.computed(() => x() + y());
+        comp.subscribe(val => {
+            expect(val).to.equal(4);
+            done();
+        });
+
+        x(2);
+    });
+
+    it('will compute with computed observables', () => {
+        var x = obs.observe(2);
+        var y = obs.observe(4);
+        var c1 = obs.computed(() => x() + y());
+
+        var z = obs.observe(6);
+        var c2 = obs.computed(() => c1() + z());
+        expect(c2()).to.equal(12);
+
+        x(4);
+        expect(c2()).to.equal(14);
+
+        z(8);
+        expect(c2()).to.equal(16);
+
+    });
+
+    it('will notify when dependent computed values change', done => {
+        var x = obs.observe(2);
+        var y = obs.observe(4);
+        var c1 = obs.computed(() => x() + y());
+
+        var z = obs.observe(6);
+        var c2 = obs.computed(() => c1() + z());
+        
+        c2.subscribe(val => {
+            expect(val).to.equal(14);
+            done();
+        });
+        
+        x(4);        
     });
     
-    it('will replicate .sort', () => {
-       var obj = obs.observeArray([1,2,3,4,5]);
-       
-       obj.sort((l, r) => l < r);
-       expect(obj.join('')).to.equal('54321');
-       obj.sort((l, r) => l > r);
-       expect(obj.join('')).to.equal('12345');
+    it('will compute with computed arrays', () => {
+       var x = obs.observeArray([1,2,3]);
+       var c = obs.computed(() => x().join(''));
+       x.push(4);
+       expect(c()).to.equal('1234');       
+    });
+    
+    it('will notify when dependent computer arrays change', done => {
+        var x = obs.observeArray([1,2,3,4]);
+        var c = obs.computed(() => x().reduce((prev, curr) => prev += curr, 0));
+        
+        c.subscribe(val => {
+           expect(val).to.equal(15);
+           done(); 
+        });
+        
+        x.push(5);        
     });
 
 });
