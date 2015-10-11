@@ -2,16 +2,16 @@ function observe(object) {
     var observable = Observable(object);
     var calledFromComputed = !!observe.caller['computed'];
     if (calledFromComputed) {
-        observable.subscribe(function () { return observable.caller['computed'](); });
+        observable.subscribe(function () { return observe.caller['computed'](); });
     }
     return Observable(object);
 }
 exports.observe = observe;
 function observeArray(object) {
     var observable = ObservableArray(object);
-    var calledFromComputed = !!observe.caller['computed'];
+    var calledFromComputed = !!observeArray.caller['computed'];
     if (calledFromComputed) {
-        observable.subscribe(function () { return observable.caller['computed'](); });
+        observable.subscribe(function () { return observeArray.caller['computed'](); });
     }
     return observable;
 }

@@ -5,7 +5,7 @@ export function observe<T>(object?: T) {
     
     var calledFromComputed = !!observe.caller['computed'];
     if (calledFromComputed) {
-        observable.subscribe(() => observable.caller['computed']());
+        observable.subscribe(() => observe.caller['computed']());
     }
     
     return Observable<T>(object);
@@ -14,9 +14,9 @@ export function observe<T>(object?: T) {
 export function observeArray<T>(object?: T[]) {
     var observable = ObservableArray<T>(object);
     
-    var calledFromComputed = !!observe.caller['computed'];
+    var calledFromComputed = !!observeArray.caller['computed'];
     if (calledFromComputed) {
-        observable.subscribe(() => observable.caller['computed']());
+        observable.subscribe(() => observeArray.caller['computed']());
     }
     
     return observable;
