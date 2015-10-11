@@ -45,7 +45,67 @@ array.remove(v => v > 'c'); // ['a', 'b', 'c']
 
 ### API
 
-Supported array functions:
+#### observe
+```javascript
+function <T>observe(value?: T): Observable<T>;
+
+// Example
+var anObservable = obs.observe(5);
+var another = obs.observe(5);
+another(7);
+```
+
+#### observeArray
+```javascript
+function <T>observeArray(values?: Array<T>): ObservableArray<T>;
+
+// Example
+var obsArray = obs.observeArray([1,2,3,4,5,6]);
+```
+
+#### computed
+```javascript
+function <T>computed(evaluator: () => T): Computed<T>;
+
+// Example (using above example values)
+var comp = obs.computed(() => anObservable() + another()); // 12
+comp.subscribe(value => /* do something */);
+another(9); // Will fire the above subscriber function 
+```
+
+### Shared functions
+All observables (`Obervable`, `ObservableArray`, `Computed`) have the following functions:
+
+#### getter
+Returns the current value of an observable with no side effects
+```javascript
+function (): any;
+
+// Example
+var someNumber = obs.observe(12);
+someNumber(); // Returns 12 with no side effects
+```
+
+#### subscribe
+Takes a function that will be called with the new value of an observable
+```javascript
+function subscribe(func: (newValue: T) => void): void;
+
+// Example
+someComputed.subscribe(newValue => $.post('/api/something', { data: newValue });
+```
+
+#### removeSubscribers
+Remove all listener functions on a specific observable.  
+*Warning*: May have undesirable side effects.
+```javascript
+function removeSubscribers();
+
+// Example
+someObservable.removeSubscribers();
+```
+
+### Supported array functions
 
 #### every
 ```javascript
