@@ -1,25 +1,11 @@
 import * as Obs from '../index.d.ts';
 
 export function observe<T>(object?: T) {
-    var observable = Observable<T>(object);
-    
-    var calledFromComputed = !!observe.caller['computed'];
-    if (calledFromComputed) {
-        observable.subscribe(() => observe.caller['computed']());
-    }
-    
     return Observable<T>(object);
 }
 
 export function observeArray<T>(object?: T[]) {
-    var observable = ObservableArray<T>(object);
-    
-    var calledFromComputed = !!observeArray.caller['computed'];
-    if (calledFromComputed) {
-        observable.subscribe(() => observeArray.caller['computed']());
-    }
-    
-    return observable;
+    return ObservableArray<T>(object);
 }
 
 export function computed<T>(evaluator: () => T) {
@@ -33,7 +19,14 @@ var Observable = <T>(val: T): Obs.Observable<T> => {
     var obs: any;
 
     obs = (newValue?: T) => {
-        if (newValue === undefined) return value;
+        if (newValue === undefined) {
+            var isCalledFromComputed = obs.caller.initialize;
+            if (isCalledFromComputed) {
+                var caller = obs.caller.computed;
+                subscribers.push(() => caller());
+            }
+            return value;
+        }
 
         value = newValue;
         subscribers.forEach(fn => fn(newValue));
@@ -73,7 +66,14 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
 
 
     obs = (newValues?: Array<T>) => {
-        if (newValues === undefined) return array;
+        if (newValues === undefined) {
+            var isCalledFromComputed = obs.caller.initialize;
+            if (isCalledFromComputed) {
+                var caller = obs.caller.computed;
+                subscribers.push(() => caller());
+            }
+            return array;
+        }
 
         if (!Array.isArray(newValues))
             throw new Error('Value is not an array');
@@ -142,44 +142,58 @@ var ObservableArray = <T>(vals: Array<T>): Obs.ObservableArray<T> => {
     obs.update = (predicate: Obs.Predicate<T, boolean>, newValue: T) => {
         var index = obs.findIndex(predicate);
         if (index === -1) return void 0;
-        
+
         array[index] = newValue;
         notify();
         return newValue;
     }
-    
+
     obs.sort = (comparer: (left: T, right: T) => number) => call('sort', comparer);
 
     return obs;
 }
 
-var Computed = <T>(evaluator: () => T) => {
+var Computed = <T>(evaluator: () => T): Obs.Computed<T> => {
     if (typeof evaluator !== 'function')
         throw new Error('Computed evaluator must be a function');
-    
+
     var subscribers = [];
-    
+
     var value: Obs.Observable<T> = null;
-    
-    var update = () => value(evaluator());
-    
+
+    var update = () => {
+        value(evaluator());
+        console.log('I was called');
+    }
+
     var comp: any;
-    
-    comp = () => evaluator();
-    
+
+    comp = () => {
+        var isCalledFromComputed = comp.caller.initialize;
+        if (isCalledFromComputed) {
+            var caller = comp.caller.computed;
+            subscribers.push(() => caller());
+        }
+        evaluator();
+    };
+
     comp.subscribe = (func: (newValue: T) => void) => {
         value.subscribe(func);
     }
-    
+
     comp.removeSubscribers = () => value.removeSubscribers();
-    
+
     function initialize(evaluator: Function) {
-        value = observe(evaluator());
+        var initialValue = evaluator();
+        value = observe(initialValue);
     }
-    
-    initialize['computed'] = () => update();
-    
+
+    evaluator['initialize'] = true;
+    evaluator['computed'] = () => value(evaluator());
+
     initialize(evaluator);
-    
-    return comp;   
+
+    evaluator['initialize'] = false;
+
+    return comp;
 }

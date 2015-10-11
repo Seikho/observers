@@ -1,19 +1,9 @@
 function observe(object) {
-    var observable = Observable(object);
-    var calledFromComputed = !!observe.caller['computed'];
-    if (calledFromComputed) {
-        observable.subscribe(function () { return observe.caller['computed'](); });
-    }
     return Observable(object);
 }
 exports.observe = observe;
 function observeArray(object) {
-    var observable = ObservableArray(object);
-    var calledFromComputed = !!observeArray.caller['computed'];
-    if (calledFromComputed) {
-        observable.subscribe(function () { return observeArray.caller['computed'](); });
-    }
-    return observable;
+    return ObservableArray(object);
 }
 exports.observeArray = observeArray;
 function computed(evaluator) {
@@ -25,8 +15,14 @@ var Observable = function (val) {
     var subscribers = [];
     var obs;
     obs = function (newValue) {
-        if (newValue === undefined)
+        if (newValue === undefined) {
+            var isCalledFromComputed = obs.caller.initialize;
+            if (isCalledFromComputed) {
+                var caller = obs.caller.computed;
+                subscribers.push(function () { return caller(); });
+            }
             return value;
+        }
         value = newValue;
         subscribers.forEach(function (fn) { return fn(newValue); });
     };
@@ -54,8 +50,14 @@ var ObservableArray = function (vals) {
     };
     var obs;
     obs = function (newValues) {
-        if (newValues === undefined)
+        if (newValues === undefined) {
+            var isCalledFromComputed = obs.caller.initialize;
+            if (isCalledFromComputed) {
+                var caller = obs.caller.computed;
+                subscribers.push(function () { return caller(); });
+            }
             return array;
+        }
         if (!Array.isArray(newValues))
             throw new Error('Value is not an array');
         array = newValues;
@@ -119,18 +121,31 @@ var Computed = function (evaluator) {
         throw new Error('Computed evaluator must be a function');
     var subscribers = [];
     var value = null;
-    var update = function () { return value(evaluator()); };
+    var update = function () {
+        value(evaluator());
+        console.log('I was called');
+    };
     var comp;
-    comp = function () { return evaluator(); };
+    comp = function () {
+        var isCalledFromComputed = comp.caller.initialize;
+        if (isCalledFromComputed) {
+            var caller = comp.caller.computed;
+            subscribers.push(function () { return caller(); });
+        }
+        evaluator();
+    };
     comp.subscribe = function (func) {
         value.subscribe(func);
     };
     comp.removeSubscribers = function () { return value.removeSubscribers(); };
     function initialize(evaluator) {
-        value = observe(evaluator());
+        var initialValue = evaluator();
+        value = observe(initialValue);
     }
-    initialize['computed'] = function () { return update(); };
+    evaluator['initialize'] = true;
+    evaluator['computed'] = function () { return value(evaluator()); };
     initialize(evaluator);
+    evaluator['initialize'] = false;
     return comp;
 };
 //# sourceMappingURL=index.js.map
