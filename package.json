@@ -1,6 +1,6 @@
 {
   "name": "observers",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "A simple implentation of JavaScript observables",
   "main": "src/index",
   "scripts": {
