@@ -64,13 +64,16 @@ var obsArray = obs.observeArray([1,2,3,4,5,6]);
 ```
 
 #### computed
+Computed observables that depend on other observables (`object`, `array` or `computed`) will re-evaluate 
+when their dependent observables are modifed.  
+See the below example:
 ```javascript
 function <T>computed(evaluator: () => T): Computed<T>;
 
 // Example (using above example values)
 var comp = obs.computed(() => anObservable() + another()); // 12
-comp.subscribe(value => /* do something */);
-another(9); // Will fire the above subscriber function 
+comp.subscribe(value => console.log(`My computed changed to ${value}`);
+another(9); // Will cause the computed to re-evaluate and notify subscribers 
 ```
 
 ### Shared functions
