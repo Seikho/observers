@@ -145,9 +145,9 @@ describe('observable array tests', function () {
     });
     it('will replicate .sort', function () {
         var obj = obs.observeArray([1, 2, 3, 4, 5]);
-        obj.sort(function (l, r) { return l < r; });
+        obj.sort(function (l, r) { return l < r ? 1 : (l > r ? -1 : 0); });
         expect(obj.join('')).to.equal('54321');
-        obj.sort(function (l, r) { return l > r; });
+        obj.sort(function (l, r) { return l > r ? 1 : (l < r ? -1 : 0); });
         expect(obj.join('')).to.equal('12345');
     });
 });

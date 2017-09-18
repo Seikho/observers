@@ -201,9 +201,9 @@ describe('observable array tests', () => {
     it('will replicate .sort', () => {
         var obj = obs.observeArray([1, 2, 3, 4, 5]);
 
-        obj.sort((l, r) => l < r);
+        obj.sort((l, r) => l < r ? 1 : (l > r ? -1 : 0));
         expect(obj.join('')).to.equal('54321');
-        obj.sort((l, r) => l > r);
+        obj.sort((l, r) => l > r ? 1 : (l < r ? -1 : 0));
         expect(obj.join('')).to.equal('12345');
     });
 
